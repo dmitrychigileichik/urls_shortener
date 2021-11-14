@@ -1,0 +1,16 @@
+body{
+display: flex;
+justify-content: center;
+flex-direction: column;
+align-items: center;
+}
+form{
+display: flex;
+justify-content: center;
+flex-direction: column;
+align-items: space-between;
+}
+p{
+justify-content: space-between;
+align-items: center;
+}

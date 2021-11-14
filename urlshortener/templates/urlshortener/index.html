@@ -1,0 +1,19 @@
+{% extends 'urlshortener/base.html' %}
+
+
+{% block body %}
+
+{% if urls %}
+
+<ul class="list-group">
+    {% for u in urls %}
+    <li class="list-group-item"> Full URL |  {{u.long_url}}</li>
+    <li class="list-group-item"> Short URL  |  {{ request.get_host }}/redirect/{{ u.short_url }}</li>
+    <li class="list-group-item"> Date of creating  |  {{u.created|date:"d-m-Y H:i:s"}}</li>
+    <p></p>
+    {% endfor %}
+</ul>
+{% else %}
+<h4> You have no shortened URLs </h4>
+{% endif %}
+{% endblock body %}
