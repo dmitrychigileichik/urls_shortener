@@ -12,6 +12,16 @@ from .models import Shortener
 
 @login_required
 def home_view(request):
+    """
+    Function has two variants of behavior. If it is GET request method -
+    it returns render just with form for further shortening.
+    If it is POST method it will check if the following 'long url' exists in
+    data base for the current user. If yes - it will return the existing 'short url'.
+    If not - it will save the following 'long url' to the data base(the 'short url' will be generated
+    by the method save() in the model class) and return the render with  necessary context.
+    :param request:
+    :return render to home:
+    """
     template = 'urlshortener/home.html'
     context = dict()
     context['form'] = ShortenerForm()
@@ -22,8 +32,10 @@ def home_view(request):
         used_form = ShortenerForm(request.POST)
         if used_form.is_valid():
             try:
+                # Trying to get the short url form db
                 shortened_object = Shortener.objects.get(long_url=used_form.cleaned_data['long_url'], user=request.user)
             except (KeyError, Shortener.DoesNotExist):
+                # Saving the long url
                 shortened_object = used_form.save(commit=False)
                 shortened_object.user = request.user
                 shortened_object.save()
@@ -38,6 +50,9 @@ def home_view(request):
 
 
 def intro(request):
+    """
+    Function to render the intro page
+    """
     template = 'urlshortener/intro.html'
     context = dict()
     context['title'] = 'Intro page'
@@ -45,6 +60,10 @@ def intro(request):
 
 
 def redirect_url_view(request, shortened_part):
+    """
+    Function that redirects you to the original 'long url'
+    or will show the 404  error if the following 'short url' exists.
+    """
     try:
         shortener = Shortener.objects.get(short_url=shortened_part)
         shortener.times_followed += 1
@@ -55,6 +74,9 @@ def redirect_url_view(request, shortened_part):
 
 
 class RegisterUser(CreateView):
+    """
+    Class for registration page
+    """
     form_class = RegisterUserForm
     template_name = 'urlshortener/register.html'
     success_url = reverse_lazy('shortener:login')
@@ -66,6 +88,9 @@ class RegisterUser(CreateView):
 
 
 class LoginUser(LoginView):
+    """
+    Class for login page
+    """
     form_class = LoginUserForm
     template_name = 'urlshortener/login.html'
 
@@ -76,11 +101,19 @@ class LoginUser(LoginView):
 
 
 def logout_user(request):
+    """
+    Function for logging out.
+    """
     logout(request)
     return redirect('shortener:login')
 
 
 class UserShorts(LoginRequiredMixin, ListView):
+    """
+    Class for page with shortened urls.
+    Shows the urls that have already shortened by
+    current user.
+    """
     model = Shortener
     template_name = 'urlshortener/index.html'
     context_object_name = 'urls'
